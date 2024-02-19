@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>英語学習アプリ</title>
+<style>
+  
+  body {
+    font-size: 18px;
+    background-color: rgb(242, 225, 198);
+    /* background-color: rgb(221, 240, 244); */
+   
+  }
+
+  input, button {
+    font-size: 16px;
+    padding: 10px;
+    margin: 5px;
+  }
+
+  .sentence {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd; /* 軽い境界線を追加 */
+    border-radius: 5px; /* 角を丸くする */
+  }
+
+  .english {
+    display: none;
+    margin-top: 5px;
+  }
+
+  p {
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+</style>
+</head>
+<body>
+    <p>🐿英語暗記フレーズアプリ🙈</p>
+    <div>
+    <input id="japaneseInput" type="text" placeholder="日本語の文">
+    <input id="englishInput" type="text" placeholder="英語の文">
+    <button onclick="addSentence()">文を追加</button>
+    </div>
+
+    <div id="sentenceList">
+    <!-- ここに文のリストが表示されます -->
+    </div>
+
+    <script>
+        function toggleEnglishVisibility(id) {
+            var englishElement = document.getElementById('english-' + id);
+            if (englishElement.style.display === 'none') {
+                englishElement.style.display = 'block';
+            } else {
+                englishElement.style.display = 'none';
+            }
+        }
+
+        function addSentence() {
+            var japaneseText = document.getElementById('japaneseInput').value;
+            var englishText = document.getElementById('englishInput').value;
+
+            if (!japaneseText || !englishText) {
+                alert('両方の言語の文を入力してください。');
+                return;
+            }
+
+            var id = document.querySelectorAll('.sentence').length;
+
+            var sentenceDiv = document.createElement('div');
+            sentenceDiv.className = 'sentence';
+            sentenceDiv.id = 'sentence-' + id;
+            sentenceDiv.innerHTML = `
+                <p>${japaneseText}</p>
+                <div id="english-${id}" class="english">${englishText}</div>
+                <button onclick="toggleEnglishVisibility(${id})">英語を表示/隠す</button>
+                <button onclick="removeSentence(${id})">削除</button>
+            `;
+
+            document.getElementById('sentenceList').appendChild(sentenceDiv);
+
+            document.getElementById('japaneseInput').value = '';
+            document.getElementById('englishInput').value = '';
+        }
+
+        function removeSentence(id) {
+            var sentenceToRemove = document.getElementById('sentence-' + id);
+            sentenceToRemove.remove();
+        }
+    </script>
+
+</body>
+</html>
