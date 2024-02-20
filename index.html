@@ -109,7 +109,7 @@
       });
     }
 
-    async function removeSentenceFromFirestore(id) {
+    window.removeSentenceFromFirestore = async function(id) {
       await deleteDoc(doc(db, "sentences", id));
       document.getElementById('sentenceList').innerHTML = '';
       loadSentences(); // リストを再読み込みして更新
