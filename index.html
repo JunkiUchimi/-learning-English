@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>英語学習アプリ</title>
+<style>
+  body {
+    font-size: 18px;
+    background-color: rgb(242, 225, 198);
+  }
+
+  input, button {
+    font-size: 16px;
+    padding: 10px;
+    margin: 5px;
+  }
+
+  .sentence {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+
+  .english {
+    display: none;
+    margin-top: 5px;
+  }
+
+  .header {
+    font-size: 40px;
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+  <div class="header">
+    <p>🐿英語暗記フレーズアプリ🙈</p>
+  </div>
+  <div>
+    <input id="japaneseInput" type="text" placeholder="日本語の文">
+    <input id="englishInput" type="text" placeholder="英語の文">
+    <button onclick="addSentenceToFirestore()">文を追加</button>
+  </div>
+
+  <div id="sentenceList">
+    <!-- ここに文のリストが表示されます -->
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyApqKW4tmO77BMi_-OWH4ucfeyTO1JsdvM",
+      authDomain: "enmmapp.firebaseapp.com",
+      projectId: "enmmapp",
+      storageBucket: "enmmapp.appspot.com",
+      messagingSenderId: "750827348081",
+      appId: "1:750827348081:web:81e0b23a951bb6a4707bd0",
+      measurementId: "G-J31168VE0D"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function addSentenceToFirestore() {
+      const japaneseInput = document.getElementById('japaneseInput').value;
+      const englishInput = document.getElementById('englishInput').value;
+
+      if (!japaneseInput || !englishInput) {
+        alert('両方の言語の文を入力してください。');
+        return;
+      }
+
+      try {
+        const docRef = await addDoc(collection(db, "sentences"), {
+          japanese: japaneseInput,
+          english: englishInput
+        });
+        console.log("Document written with ID: ", docRef.id);
+        appendSentence(docRef.id, japaneseInput, englishInput);
+      } catch (e) {
+        console.error("Error adding document: ", e);
+      }
+
+      document.getElementById('japaneseInput').value = '';
+      document.getElementById('englishInput').value = '';
+    }
+
+    function appendSentence(id, japanese, english) {
+      const sentenceListElement = document.getElementById('sentenceList');
+      const sentenceDiv = document.createElement('div');
+      sentenceDiv.className = 'sentence';
+      sentenceDiv.innerHTML = `
+        <p>${japanese}</p>
+        <div id="english-${id}" class="english">${english}</div>
+        <button onclick="toggleEnglishVisibility('${id}')">英語を表示/隠す</button>
+        <button onclick="removeSentenceFromFirestore('${id}')">削除</button>
+      `;
+      sentenceListElement.appendChild(sentenceDiv);
+    }
+
+    async function loadSentences() {
+      const querySnapshot = await getDocs(collection(db, "sentences"));
+      querySnapshot.forEach((doc) => {
+        appendSentence(doc.id, doc.data().japanese, doc.data().english);
+      });
+    }
+
+    async function removeSentenceFromFirestore(id) {
+      await deleteDoc(doc(db, "sentences", id));
+      document.getElementById('sentenceList').innerHTML = '';
+      loadSentences(); // リストを再読み込みして更新
+    }
+
+    function toggleEnglishVisibility(id) {
+      var englishElement = document.getElementById('english-' + id);
+      if (englishElement.style.display === 'none') {
+          englishElement.style.display = 'block';
+      } else {
+          englishElement.style.display = 'none';
+      }
+    }
+
+    window.onload = () => {
+      loadSentences();
+    };
+  </script>
+</body>
+</html>
