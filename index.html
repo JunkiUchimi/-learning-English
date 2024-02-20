@@ -125,6 +125,54 @@
       }
     };
 
+    function appendSentence(id, japanese, english) {
+      const sentenceListElement = document.getElementById('sentenceList');
+      const sentenceDiv = document.createElement('div');
+      sentenceDiv.className = 'sentence';
+      sentenceDiv.innerHTML = `
+        <p id="japanese-${id}">${japanese}</p> <!-- 和文 -->
+        <p id="english-${id}">${english}</p> <!-- 英文 -->
+        <button onclick="toggleEnglishVisibility('${id}')">英語を表示/隠す</button>
+        <button onclick="removeSentenceFromFirestore('${id}')">削除</button>
+        <button onclick="editSentence('${id}')">編集</button> <!-- 編集ボタンを追加 -->
+      `;
+      sentenceListElement.appendChild(sentenceDiv);
+    }
+
+    window.editSentence = function(id) {
+      const japaneseElement = document.getElementById('japanese-' + id);
+      const englishElement = document.getElementById('english-' + id);
+      
+      const japaneseText = japaneseElement.innerText;
+      const englishText = englishElement.innerText;
+    
+      japaneseElement.innerHTML = `<input type="text" id="edit-japanese-${id}" value="${japaneseText}">`;
+      englishElement.innerHTML = `<input type="text" id="edit-english-${id}" value="${englishText}">`;
+    
+      // 「保存」ボタンを追加して、編集を保存できるようにします
+      const saveButton = document.createElement('button');
+      saveButton.innerText = '保存';
+      saveButton.onclick = function() { saveEdit(id); };
+      japaneseElement.appendChild(saveButton);
+    }
+
+    window.saveEdit = async function(id) {
+      const editedJapanese = document.getElementById('edit-japanese-' + id).value;
+      const editedEnglish = document.getElementById('edit-english-' + id).value;
+    
+      // Firestoreのドキュメントを更新
+      const sentenceDocRef = doc(db, "sentences", id);
+      await updateDoc(sentenceDocRef, {
+        japanese: editedJapanese,
+        english: editedEnglish
+      });
+    
+      // 表示を更新
+      document.getElementById('japanese-' + id).innerText = editedJapanese;
+      document.getElementById('english-' + id).innerText = editedEnglish;
+    
+      // 必要に応じて、編集フィールドや保存ボタンを削除します
+    }
     window.onload = () => {
       loadSentences();
     };
