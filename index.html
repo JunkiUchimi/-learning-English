@@ -4,12 +4,9 @@
 <meta charset="UTF-8">
 <title>英語学習アプリ</title>
 <style>
-  
   body {
     font-size: 18px;
     background-color: rgb(242, 225, 198);
-    /* background-color: rgb(221, 240, 244); */
-   
   }
 
   input, button {
@@ -21,8 +18,8 @@
   .sentence {
     margin-bottom: 20px;
     padding: 10px;
-    border: 1px solid #ddd; /* 軽い境界線を追加 */
-    border-radius: 5px; /* 角を丸くする */
+    border: 1px solid #ddd;
+    border-radius: 5px;
   }
 
   .english {
@@ -30,16 +27,17 @@
     margin-top: 5px;
   }
 
-  p {
+  .header {
     font-size: 40px;
     text-align: center;
     font-weight: bold;
   }
-
 </style>
 </head>
 <body>
-    <p>🐿英語暗記フレーズアプリ🙈</p>
+    <div class="header">
+      <p>🐿英語暗記フレーズアプリ🙈</p>
+    </div>
     <div>
     <input id="japaneseInput" type="text" placeholder="日本語の文">
     <input id="englishInput" type="text" placeholder="英語の文">
@@ -69,8 +67,27 @@
                 return;
             }
 
-            var id = document.querySelectorAll('.sentence').length;
+            var sentences = JSON.parse(localStorage.getItem('sentences')) || [];
+            var id = sentences.length;
 
+            sentences.push({japaneseText, englishText});
+            localStorage.setItem('sentences', JSON.stringify(sentences));
+
+            appendSentence(id, japaneseText, englishText);
+
+            document.getElementById('japaneseInput').value = '';
+            document.getElementById('englishInput').value = '';
+        }
+
+        function removeSentence(id) {
+            var sentences = JSON.parse(localStorage.getItem('sentences'));
+            sentences.splice(id, 1);
+            localStorage.setItem('sentences', JSON.stringify(sentences));
+            document.getElementById('sentenceList').innerHTML = '';
+            sentences.forEach((sentence, index) => appendSentence(index, sentence.japaneseText, sentence.englishText));
+        }
+
+        function appendSentence(id, japaneseText, englishText) {
             var sentenceDiv = document.createElement('div');
             sentenceDiv.className = 'sentence';
             sentenceDiv.id = 'sentence-' + id;
@@ -82,15 +99,14 @@
             `;
 
             document.getElementById('sentenceList').appendChild(sentenceDiv);
-
-            document.getElementById('japaneseInput').value = '';
-            document.getElementById('englishInput').value = '';
         }
 
-        function removeSentence(id) {
-            var sentenceToRemove = document.getElementById('sentence-' + id);
-            sentenceToRemove.remove();
+        function loadSentences() {
+            var sentences = JSON.parse(localStorage.getItem('sentences')) || [];
+            sentences.forEach((sentence, index) => appendSentence(index, sentence.japaneseText, sentence.englishText));
         }
+
+        window.onload = loadSentences;
     </script>
 
 </body>
