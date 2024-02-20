@@ -118,10 +118,10 @@
 
     window.toggleEnglishVisibility = function(id) {
       var englishElement = document.getElementById('english-' + id);
-      if (englishElement.style.display === 'none' || englishElement.style.display === '') {
-        englishElement.style.display = 'block';
+      if (englishElement.style.display === 'none') {
+        englishElement.style.display = 'block'; // 英文を表示
       } else {
-        englishElement.style.display = 'none';
+        englishElement.style.display = 'none'; // 英文を非表示
       }
     };
 
