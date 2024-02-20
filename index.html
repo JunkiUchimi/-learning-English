@@ -50,8 +50,8 @@
   </div>
 
   <script type="module">
-   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-   import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApqKW4tmO77BMi_-OWH4ucfeyTO1JsdvM",
@@ -90,6 +90,19 @@
       document.getElementById('englishInput').value = '';
     }
 
+    function appendSentence(id, japanese, english) {
+      const sentenceListElement = document.getElementById('sentenceList');
+      const sentenceDiv = document.createElement('div');
+      sentenceDiv.className = 'sentence';
+      sentenceDiv.innerHTML = `
+        <p>${japanese}</p> <!-- 日本語の文を常に表示 -->
+        <div id="english-${id}" class="english">${english}</div> <!-- 英語の文は表示/非表示を切り替え可能 -->
+        <button onclick="toggleEnglishVisibility('${id}')">英語を表示/隠す</button>
+        <button onclick="removeSentenceFromFirestore('${id}')">削除</button>
+      `;
+      sentenceListElement.appendChild(sentenceDiv);
+    }
+
     async function loadSentences() {
       const querySnapshot = await getDocs(collection(db, "sentences"));
       querySnapshot.forEach((doc) => {
@@ -116,13 +129,12 @@
       const sentenceListElement = document.getElementById('sentenceList');
       const sentenceDiv = document.createElement('div');
       sentenceDiv.className = 'sentence';
-      sentenceDiv.id = `sentence-${id}`; // コンテナにIDを設定
       sentenceDiv.innerHTML = `
-        <p>${japanese}</p> <!-- 和文 -->
-        <div class="english">${english}</div> <!-- 英文 -->
-        <button onclick="toggleVisibility('${id}')">表示/非表示</button>
-        <button onclick="editSentence('${id}')">編集</button>
+        <p id="japanese-${id}">${japanese}</p> <!-- 和文 -->
+        <p id="english-${id}">${english}</p> <!-- 英文 -->
+        <button onclick="toggleEnglishVisibility('${id}')">英語を表示/隠す</button>
         <button onclick="removeSentenceFromFirestore('${id}')">削除</button>
+        <button onclick="editSentence('${id}')">編集</button> <!-- 編集ボタンを追加 -->
       `;
       sentenceListElement.appendChild(sentenceDiv);
     }
@@ -161,17 +173,6 @@
     
       // 必要に応じて、編集フィールドや保存ボタンを削除します
     }
-
-    window.toggleVisibility = function(id) {
-      const sentenceDiv = document.getElementById(`sentence-${id}`);
-      if (sentenceDiv.style.display === 'none') {
-        sentenceDiv.style.display = ''; // コンテナを表示
-      } else {
-        sentenceDiv.style.display = 'none'; // コンテナを非表示
-      }
-    };
-
-    
     window.onload = () => {
       loadSentences();
     };
