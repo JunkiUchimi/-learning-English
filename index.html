@@ -48,8 +48,9 @@
     <!-- ここに文のリストが表示されます -->
     </div>
 
-    <script>
-        function toggleEnglishVisibility(id) {
+
+    <script type="module">
+      function toggleEnglishVisibility(id) {
             var englishElement = document.getElementById('english-' + id);
             if (englishElement.style.display === 'none') {
                 englishElement.style.display = 'block';
@@ -58,26 +59,7 @@
             }
         }
 
-        function addSentence() {
-            var japaneseText = document.getElementById('japaneseInput').value;
-            var englishText = document.getElementById('englishInput').value;
-
-            if (!japaneseText || !englishText) {
-                alert('両方の言語の文を入力してください。');
-                return;
-            }
-
-            var sentences = JSON.parse(localStorage.getItem('sentences')) || [];
-            var id = sentences.length;
-
-            sentences.push({japaneseText, englishText});
-            localStorage.setItem('sentences', JSON.stringify(sentences));
-
-            appendSentence(id, japaneseText, englishText);
-
-            document.getElementById('japaneseInput').value = '';
-            document.getElementById('englishInput').value = '';
-        }
+        
 
         function removeSentence(id) {
             var sentences = JSON.parse(localStorage.getItem('sentences'));
@@ -86,51 +68,61 @@
             document.getElementById('sentenceList').innerHTML = '';
             sentences.forEach((sentence, index) => appendSentence(index, sentence.japaneseText, sentence.englishText));
         }
-
-        function appendSentence(id, japaneseText, englishText) {
-            var sentenceDiv = document.createElement('div');
-            sentenceDiv.className = 'sentence';
-            sentenceDiv.id = 'sentence-' + id;
-            sentenceDiv.innerHTML = `
-                <p>${japaneseText}</p>
-                <div id="english-${id}" class="english">${englishText}</div>
-                <button onclick="toggleEnglishVisibility(${id})">英語を表示/隠す</button>
-                <button onclick="removeSentence(${id})">削除</button>
-            `;
-
-            document.getElementById('sentenceList').appendChild(sentenceDiv);
-        }
-
-        function loadSentences() {
-            var sentences = JSON.parse(localStorage.getItem('sentences')) || [];
-            sentences.forEach((sentence, index) => appendSentence(index, sentence.japaneseText, sentence.englishText));
-        }
-
-        window.onload = loadSentences;
-    </script>
-    <script type="module">
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-    
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
       const firebaseConfig = {
-        apiKey: "AIzaSyApqKW4tmO77BMi_-OWH4ucfeyTO1JsdvM",
-        authDomain: "enmmapp.firebaseapp.com",
-        projectId: "enmmapp",
-        storageBucket: "enmmapp.appspot.com",
-        messagingSenderId: "750827348081",
-        appId: "1:750827348081:web:81e0b23a951bb6a4707bd0",
-        measurementId: "G-J31168VE0D"
+        // Your web app's Firebase configuration
       };
-    
+
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
+      const db = getFirestore(app);
+
+      async function addSentence() {
+        const japaneseInput = document.getElementById('japaneseInput').value;
+        const englishInput = document.getElementById('englishInput').value;
+
+        if (!japaneseInput || !englishInput) {
+          alert('両方の言語の文を入力してください。');
+          return;
+        }
+
+        try {
+          await addDoc(collection(db, "sentences"), {
+            japanese: japaneseInput,
+            english: englishInput
+          });
+          console.log("Document written");
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
+
+        // 文の追加後の処理（例：入力フィールドをクリア）
+      }
+
+      async function loadSentences() {
+        const querySnapshot = await getDocs(collection(db, "sentences"));
+        const sentenceListElement = document.getElementById('sentenceList');
+        sentenceListElement.innerHTML = ''; // 既存の文をクリア
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const sentenceDiv = document.createElement('div');
+          sentenceDiv.className = 'sentence';
+          sentenceDiv.innerHTML = `
+            <p>${data.japanese}</p>
+            <div class="english">${data.english}</div>
+            <button onclick="toggleEnglishVisibility('${doc.id}')">英語を表示/隠す</button>
+            <button onclick="removeSentence('${doc.id}')">削除</button>
+          `;
+          sentenceListElement.appendChild(sentenceDiv);
+        });
+      }
+
+      window.onload = () => {
+        loadSentences();
+      };
     </script>
-  
 </body>
 </html>
