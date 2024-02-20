@@ -126,16 +126,16 @@
       }
     };
 
-    function appendSentence(id, japanese, english) {
+   function appendSentence(id, japanese, english) {
       const sentenceListElement = document.getElementById('sentenceList');
       const sentenceDiv = document.createElement('div');
       sentenceDiv.className = 'sentence';
       sentenceDiv.innerHTML = `
-        <p id="japanese-${id}">${japanese}</p> <!-- 和文 -->
-        <p id="english-${id}">${english}</p> <!-- 英文 -->
+        <p id="japanese-${id}">${japanese}</p> <!-- 日本語の文 -->
+        <p id="english-${id}" class="english">${english}</p> <!-- 英語の文を初期状態で非表示にするクラスを適用 -->
         <button onclick="toggleEnglishVisibility('${id}')">英語を表示/隠す</button>
         <button onclick="removeSentenceFromFirestore('${id}')">削除</button>
-        <button onclick="editSentence('${id}')">編集</button> <!-- 編集ボタンを追加 -->
+        <button onclick="editSentence('${id}')">編集</button>
       `;
       sentenceListElement.appendChild(sentenceDiv);
     }
