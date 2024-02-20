@@ -115,18 +115,14 @@
       loadSentences(); // リストを再読み込みして更新
     }
 
-    function toggleEnglishVisibility(id) {
+    window.toggleEnglishVisibility = function(id) {
       var englishElement = document.getElementById('english-' + id);
-      if (englishElement) {
-        if (englishElement.style.display === 'none' || englishElement.style.display === '') {
-          englishElement.style.display = 'block';
-        } else {
-          englishElement.style.display = 'none';
-        }
+      if (englishElement.style.display === 'none' || englishElement.style.display === '') {
+        englishElement.style.display = 'block';
       } else {
-        console.error('英語の要素が見つかりません:', 'english-' + id);
+        englishElement.style.display = 'none';
       }
-    }
+    };
 
     window.onload = () => {
       loadSentences();
