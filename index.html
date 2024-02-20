@@ -49,9 +49,8 @@
   </div>
 
   <script type="module">
-   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyApqKW4tmO77BMi_-OWH4ucfeyTO1JsdvM",
@@ -63,7 +62,6 @@
       measurementId: "G-J31168VE0D"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
@@ -82,13 +80,13 @@
           english: englishInput
         });
         console.log("Document written with ID: ", docRef.id);
-        appendSentence(docRef.id, japaneseInput, englishInput); // ここでDOMに追加
+        appendSentence(docRef.id, japaneseInput, englishInput);
       } catch (e) {
         console.error("Error adding document: ", e);
       }
 
-      document.getElementById('japaneseInput').value = ''; // 入力フィールドをクリア
-      document.getElementById('englishInput').value = ''; // 入力フィールドをクリア
+      document.getElementById('japaneseInput').value = '';
+      document.getElementById('englishInput').value = '';
     }
 
     function appendSentence(id, japanese, english) {
@@ -111,10 +109,24 @@
       });
     }
 
+    async function removeSentenceFromFirestore(id) {
+      await deleteDoc(doc(db, "sentences", id));
+      document.getElementById('sentenceList').innerHTML = '';
+      loadSentences(); // リストを再読み込みして更新
+    }
+
+    function toggleEnglishVisibility(id) {
+      var englishElement = document.getElementById('english-' + id);
+      if (englishElement.style.display === 'none') {
+          englishElement.style.display = 'block';
+      } else {
+          englishElement.style.display = 'none';
+      }
+    }
+
     window.onload = () => {
       loadSentences();
     };
-  </script>
   </script>
 </body>
 </html>
