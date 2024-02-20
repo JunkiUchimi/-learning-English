@@ -90,19 +90,6 @@
       document.getElementById('englishInput').value = '';
     }
 
-    function appendSentence(id, japanese, english) {
-      const sentenceListElement = document.getElementById('sentenceList');
-      const sentenceDiv = document.createElement('div');
-      sentenceDiv.className = 'sentence';
-      sentenceDiv.innerHTML = `
-        <p>${japanese}</p> <!-- 日本語の文を常に表示 -->
-        <div id="english-${id}" class="english">${english}</div> <!-- 英語の文は表示/非表示を切り替え可能 -->
-        <button onclick="toggleEnglishVisibility('${id}')">英語を表示/隠す</button>
-        <button onclick="removeSentenceFromFirestore('${id}')">削除</button>
-      `;
-      sentenceListElement.appendChild(sentenceDiv);
-    }
-
     async function loadSentences() {
       const querySnapshot = await getDocs(collection(db, "sentences"));
       querySnapshot.forEach((doc) => {
