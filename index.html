@@ -65,7 +65,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function addSentenceToFirestore() {
+    window.addSentenceToFirestore = async function() {
       const japaneseInput = document.getElementById('japaneseInput').value;
       const englishInput = document.getElementById('englishInput').value;
 
