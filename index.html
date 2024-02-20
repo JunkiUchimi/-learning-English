@@ -117,10 +117,14 @@
 
     function toggleEnglishVisibility(id) {
       var englishElement = document.getElementById('english-' + id);
-      if (englishElement.style.display === 'none') {
+      if (englishElement) {
+        if (englishElement.style.display === 'none' || englishElement.style.display === '') {
           englishElement.style.display = 'block';
-      } else {
+        } else {
           englishElement.style.display = 'none';
+        }
+      } else {
+        console.error('英語の要素が見つかりません:', 'english-' + id);
       }
     }
 
